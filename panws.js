@@ -20,62 +20,94 @@ const inlineConverter = (sign) => {
       return false;
   }
 };
+const checkTurn = (color, gameObj) => {
+  const moveEvent = new Event('move');
+  document.dispatchEvent(moveEvent);
+  if (color[0] === 'b' && gameObj.turn) {
+    return false;
+  } if (color[0] === 'w' && !gameObj.turn) {
+    return false;
+  }
+  return true;
+};
 
-class Pawns {
-  constructor(color) {
-    this.color = `${color}P`;
+class NewPawn {
+  move(position, color) {
+    const side = (color === 'wP') ? 1 : -1;
+    const vertical = Number(position[1]);
+    const legalMov = [];
+    legalMov.push(`${position[0]}${vertical + side}`);
+    console.log(legalMov);
+    return legalMov;
   }
 
-  moveShema(source, target) {
+  atack(position, color) {
+    const side = (color === 'wP') ? 1 : -1;
+    const vertical = Number(position[1]);
+    const inline = inlineConverter(position[0]);
+    const legalMov = [];
+
+
+  }
+}
+
+const x = new NewPawn();
+x.move('e7', 'wP');
+
+export class Pawns {
+  moveShema = (source, target, color, gameObj) => {
     const actualVertical = Number(source[1]);
     const actualInline = source[0];
     const newVertical = Number(target[1]);
     const newInline = target[0];
-    const side = (this.color === 'wP') ? 1 : -1;
-    if (newVertical > 8 || newVertical <= 0) {
+    const side = (color === 'wP') ? 1 : -1;
+    const turn = checkTurn(color, gameObj);
+
+    if (target === 'offboard') {
+      return false;
+    }
+    if (!turn) {
       return false;
     }
 
-    return (actualVertical + side === newVertical && actualInline === newInline);
-  }
+    if (actualVertical + side === newVertical && actualInline === newInline && turn) {
+      gameObj.turn = !gameObj.turn;
+      const black = new Event('black');
+      if (!gameObj.turn) {
+        document.dispatchEvent(black);
+      }
+      return true;
+    }
+    return false;
+  };
 
-  attackShema(source, target) {
+  attackShema(source, target, color, gameObj) {
     const actualVertical = Number(source[1]);
     const actualInline = inlineConverter(source[0]);
     const newVertical = Number(target[1]);
     const newInline = inlineConverter(target[0]);
-    const side = (this.color === 'wP') ? 1 : -1;
+    const side = (color === 'wP') ? 1 : -1;
+    const turn = checkTurn(color, gameObj);
+    if (target === 'offboard') {
+      return false;
+    }
 
-    if (newVertical > 8 || newVertical <= 0) {
+    if (!turn) {
       return false;
     }
 
     if (actualVertical + side === newVertical) {
       if (actualInline + 1 === newInline || actualInline - 1 === newInline) {
+        gameObj.turn = !gameObj.turn;
         return true;
       }
     }
     return false;
   }
-
-  levelAp(target) {
-    const newVertical = Number(target[1]);
-    if (this.color === 'bP' && newVertical === 1) {
-      return true;
-    }
-    if (this.color === 'wP' && newVertical === 8) {
-      return true;
-    }
-    return false;
-  }
 }
 
-class Queen {
-  constructor(color) {
-    this.color = `${color}Q`;
-  }
-
-  moveAndAttackShema(source, target) {
+export class Queen {
+  moveAndAttackShema(source, target, color, gameObj) {
     const actualVertical = Number(source[1]);
     const actualInline = inlineConverter(source[0]);
     const newVertical = Number(target[1]);
@@ -83,50 +115,50 @@ class Queen {
 
     const inlineMove = newInline - actualInline;
     const verticalMove = newVertical - actualVertical;
+    const turn = checkTurn(color, gameObj);
 
-    if (newVertical > 8 || newVertical <= 0) {
+    if (target === 'offboard') {
+      return false;
+    }
+    // check turn
+    if (!turn) {
       return false;
     }
 
     if (inlineMove <= 1 && inlineMove >= -1 && verticalMove <= 1 && verticalMove >= -1) {
+      gameObj.turn = !gameObj.turn;
       return true;
     }
     return false;
   }
 }
 
-class King {
-  constructor(color) {
-    this.color = `${color}K`;
-  }
-
-  moveAndAttackShema(source, target) {
+export class King {
+  moveAndAttackShema(source, target, color, gameObj) {
     const actualVertical = Number(source[1]);
     const actualInline = inlineConverter(source[0]);
     const newVertical = Number(target[1]);
     const newInline = inlineConverter(target[0]);
     const inlineMove = newInline - actualInline;
     const verticalMove = newVertical - actualVertical;
+    const turn = checkTurn(color, gameObj);
 
-    if (newVertical > 8 || newVertical <= 0) {
+    if (target === 'offboard') {
+      return false;
+    }
+    // check turn
+    if (!turn) {
       return false;
     }
 
     if (inlineMove <= 1 && inlineMove >= -1 && verticalMove === 0) {
+      gameObj.turn = !gameObj.turn;
       return true;
     } if (inlineMove === 0 && verticalMove <= 1 && verticalMove >= -1) {
+      gameObj.turn = !gameObj.turn;
       return true;
     }
 
     return false;
   }
 }
-
-const x = new King();
-const y = x.moveAndAttackShema('d4', 'd6');
-console.log(y);
-module.exports = {
-  Pawns,
-  Queen,
-  King,
-};
