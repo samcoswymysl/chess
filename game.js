@@ -41,7 +41,7 @@ const NumberToLetter = [
   undefined,
 ];
 
-console.log(myBoard);
+
 export default class Game {
   constructor(gamer) {
     this.gamer = gamer;
@@ -89,13 +89,13 @@ export default class Game {
       if (Number(piece[1]) === 1 && actualPos[piece] === 'bP') {
         actualPos[piece] = 'bQ';
         // this.config.onDrop = 'trash';
-        console.log(actualPos[piece]);
+
         const fen = Chessboard.objToFen(actualPos);
         this.board.position(fen);
       } else if (Number(piece[1]) === 8 && actualPos[piece] === 'wP') {
         actualPos[piece] = 'wQ';
         // this.config.onDrop = 'trash';
-        console.log(actualPos[piece]);
+
         const fen = Chessboard.objToFen(actualPos);
         this.board.position(fen);
       }
@@ -109,12 +109,11 @@ export default class Game {
     // }
   }
 
-  //generate table 2d for all white moves, in el[0] old position in el[1] new position
+  // generate table 2d for all white moves, in el[0] old position in el[1] new position
   genereteArrForWait = (whitePownAndPosition, whitePosition, blackPosition) => {
     const whiteMoves = [];
 
     for (const onePos of whitePownAndPosition) {
-      console.log(whiteMoves);
       // position
       const place = onePos[0];
       const vertical = Number(place[1]);
@@ -162,7 +161,6 @@ export default class Game {
         // back
         if (vertical > 1 && !whitePosition.includes(`${back}`)) {
           whiteMoves.push([place, back]);
-          console.log(vertical >= 1);
         }
         // right
         if (inlineRight && !whitePosition.includes(`${right}`)) {
@@ -193,7 +191,91 @@ export default class Game {
         }
       }
     }
-     return whiteMoves;
+    return whiteMoves;
+  };
+
+  genereteArMoveBlack = (blackPownAndPosition, blackPosition, whitePosition) => {
+    const blackMoves = [];
+
+    for (const onePos of blackPownAndPosition) {
+      // position
+      const place = onePos[0];
+      const vertical = Number(place[1]);
+      const inline = place[0];
+      // inline give letter
+      const inlineRight = NumberToLetter[letterToNumber(inline) + 1];
+      const inlineLeft = NumberToLetter[letterToNumber(inline) - 1];
+
+      // Crooss
+      const frontRight = `${inlineRight}${vertical + 1}`;
+      const frontLeft = `${inlineLeft}${vertical + 1}`;
+      const backRight = `${inlineRight}${vertical - 1}`;
+      const backLeft = `${inlineLeft}${vertical - 1}`;
+
+      // Vertical
+      const front = `${inline}${vertical + 1}`;
+      const back = `${inline}${vertical - 1}`;
+
+      // inline
+
+      const right = `${inlineRight}${vertical}`;
+      const left = `${inlineLeft}${vertical}`;
+
+      // white Pown
+      // if places ahed dont have black pown
+      if (onePos[1] === 'bP') {
+        if (!blackPosition.includes(`${back}`) && vertical > 1 && vertical < 8 && !whitePosition.includes(`${back}`)) {
+          blackMoves.push([place, back]);
+        }
+
+        if (inlineRight && whitePosition.includes(`${backRight}`) && !blackPosition.includes(`${backRight}`)) {
+          blackMoves.push([place, backRight]);
+        }
+
+        if (inlineLeft && whitePosition.includes(`${backLeft}`) && !blackPosition.includes(`${backLeft}`)) {
+          blackMoves.push([place, backLeft]);
+        }
+      }
+      // for side on Queen and king
+      if (onePos[1] === 'bQ' || onePos[1] === 'bK') {
+        // front
+        if (vertical < 8 && !blackPosition.includes(`${front}`)) {
+          blackMoves.push([place, front]);
+        }
+        // back
+        if (vertical > 1 && !blackPosition.includes(`${back}`)) {
+          blackMoves.push([place, back]);
+        }
+        // right
+        if (inlineRight && !blackPosition.includes(`${right}`)) {
+          blackMoves.push([place, right]);
+        }
+        // left
+        if (inlineLeft && !blackPosition.includes(`${left}`)) {
+          blackMoves.push([place, left]);
+        }
+      }
+      // for side for queen(cross)
+      if (onePos[1] === 'bQ') {
+        // Front Right
+        if (vertical < 8 && inlineRight && !blackPosition.includes(`${frontRight}`)) {
+          blackMoves.push([place, frontRight]);
+        }
+        // front Left
+        if (vertical < 8 && inlineRight && !blackPosition.includes(`${frontLeft}`)) {
+          blackMoves.push([place, frontLeft]);
+        }
+        // back Right
+        if (vertical > 1 && inlineRight && !blackPosition.includes(`${backRight}`)) {
+          blackMoves.push([place, backRight]);
+        }
+        // back left
+        if (vertical > 1 && inlineRight && !blackPosition.includes(`${backLeft}`)) {
+          blackMoves.push([place, backLeft]);
+        }
+      }
+    }
+    return blackMoves;
   };
 
   posibleMove = async () => {
@@ -215,7 +297,8 @@ export default class Game {
       }
     });
     const whiteMoves = this.genereteArrForWait(whitePownAndPosition, whitePosition, blackPosition);
-    console.log(whiteMoves);
+    const blackMoves = this.genereteArMoveBlack(blackPownAndPosition,blackPosition,whitePosition)
+    console.log(blackMoves);
   };
 
   onDrop = (source, target, piece, newPos, oldPos) => {
