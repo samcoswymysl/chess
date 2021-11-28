@@ -17,7 +17,7 @@ The pawn, when it reaches the end of the board, turns into a queen
 
 ### How to use
 You need to have a node installed, preferably version 16.4.2. Once you have the files on your computer use the command "npm i" in the root directory and then node app.js.
-Open your browser to https:\\localhost:3000 and enjoy  or go to https://chess-rafal-krukowski.herokuapp.com/ and play
+Open your browser to https://localhost:3000 and enjoy  or go to https://chess-rafal-krukowski.herokuapp.com/ and play
 
 
 
