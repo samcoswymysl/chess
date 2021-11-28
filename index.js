@@ -104,7 +104,7 @@ const position = (onePos) => {
   };
 };
 
-const generateArrForWait = (ourPawnAndPosition, white, black, color) => {
+const generateArrLegalMoves = (ourPawnAndPosition, white, black, color) => {
   const possibleMoves = [];
   const allies = (color === 'white') ? white : black;
   const enemies = (color === 'white') ? black : white;
@@ -130,7 +130,6 @@ const generateArrForWait = (ourPawnAndPosition, white, black, color) => {
     const pawn = (color === 'white') ? [
       'wP', front, frontRight, frontLeft] : ['bP', back, backRight, backLeft];
     // console.log(vertical > 1 && vertical < 8)
-
 
     // if places ahed dont have ahe pown
     if (onePos[1] === pawn[0]) {
@@ -189,8 +188,6 @@ const generateArrForWait = (ourPawnAndPosition, white, black, color) => {
   return possibleMoves;
 };
 
-
-
 const onDragStart = (source, piece) => {
   if (turn && piece.search(/^b/) !== -1) {
     return false;
@@ -199,9 +196,9 @@ const onDragStart = (source, piece) => {
 
 const levelUpPawn = (newPos) => {
   const newPosition = newPos;
-  const x = Object.entries(newPosition);
+  const newPosArr2d = Object.entries(newPosition);
 
-  x.forEach((el) => {
+  newPosArr2d.forEach((el) => {
     const field = el[0];
     const pawn = el[1];
 
@@ -251,8 +248,8 @@ function possibleMove() {
       return el;
     }
   });
-  const whiteMoves = generateArrForWait(whitePawnAndPosition, whitePosition, blackPosition, 'white');
-  const blackMoves = generateArrForWait(blackPawnAndPosition, whitePosition, blackPosition, 'black');
+  const whiteMoves = generateArrLegalMoves(whitePawnAndPosition, whitePosition, blackPosition, 'white');
+  const blackMoves = generateArrLegalMoves(blackPawnAndPosition, whitePosition, blackPosition, 'black');
 
   checkWinner(whiteMoves, blackMoves);
 
