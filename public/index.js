@@ -1,3 +1,5 @@
+//Simple Chess | (c) 2021 Rafał Krukowski
+
 const myBoard = document.querySelector('#board');
 const winner = document.querySelector('.winner');
 const startAgainBTN = document.querySelector('.startBtn');

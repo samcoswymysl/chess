@@ -1,5 +1,5 @@
 {
-  "name": "szachy",
+  "name": "Simple Chess",
   "version": "1.0.0",
   "description": "",
   "main": "public/index.js",
@@ -14,7 +14,7 @@
     "start": "node app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Rafał Krukowski",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.16.0",
