@@ -172,7 +172,7 @@ const generateArrLegalMoves = (ourPawnAndPosition, white, black, color) => {
         possibleMoves.push([place, frontRight, onePos[1]]);
       }
       // front Left
-      if (vertical < 8 && inlineRight && !allies.includes(`${frontLeft}`)) {
+      if (vertical < 8 && inlineLeft && !allies.includes(`${frontLeft}`)) {
         possibleMoves.push([place, frontLeft, onePos[1]]);
       }
       // back Right
@@ -180,7 +180,7 @@ const generateArrLegalMoves = (ourPawnAndPosition, white, black, color) => {
         possibleMoves.push([place, backRight, onePos[1]]);
       }
       // back left
-      if (vertical > 1 && inlineRight && !allies.includes(`${backLeft}`)) {
+      if (vertical > 1 && inlineLeft && !allies.includes(`${backLeft}`)) {
         possibleMoves.push([place, backLeft, onePos[1]]);
       }
     }
