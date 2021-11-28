@@ -134,15 +134,15 @@ const generateArrLegalMoves = (ourPawnAndPosition, white, black, color) => {
     // if places ahed dont have ahe pown
     if (onePos[1] === pawn[0]) {
       if (!enemies.includes(`${pawn[1]}`) && vertical > 1 && vertical < 8 && !allies.includes(`${pawn[1]}`)) {
-        possibleMoves.push([place, pawn[1]]);
+        possibleMoves.push([place, pawn[1], onePos[1]]);
       }
 
       if (inlineRight && enemies.includes(`${pawn[2]}`) && !allies.includes(`${pawn[2]}`)) {
-        possibleMoves.push([place, pawn[2]]);
+        possibleMoves.push([place, pawn[2], onePos[1]]);
       }
 
       if (inlineLeft && enemies.includes(`${pawn[3]}`) && !allies.includes(`${pawn[3]}`)) {
-        possibleMoves.push([place, pawn[3]]);
+        possibleMoves.push([place, pawn[3], onePos[1]]);
       }
     }
 
@@ -150,38 +150,38 @@ const generateArrLegalMoves = (ourPawnAndPosition, white, black, color) => {
     if (onePos[1] === queen || onePos[1] === king) {
       // front
       if (vertical < 8 && !allies.includes(`${front}`)) {
-        possibleMoves.push([place, front]);
+        possibleMoves.push([place, front, onePos[1]]);
       }
       // back
       if (vertical > 1 && !allies.includes(`${back}`)) {
-        possibleMoves.push([place, back]);
+        possibleMoves.push([place, back, onePos[1]]);
       }
       // right
       if (inlineRight && !allies.includes(`${right}`)) {
-        possibleMoves.push([place, right]);
+        possibleMoves.push([place, right, onePos[1]]);
       }
       // left
       if (inlineLeft && !allies.includes(`${left}`)) {
-        possibleMoves.push([place, left]);
+        possibleMoves.push([place, left, onePos[1]]);
       }
     }
     // for side for queen(cross)
     if (onePos[1] === queen) {
       // Front Right
       if (vertical < 8 && inlineRight && !allies.includes(`${frontRight}`)) {
-        possibleMoves.push([place, frontRight]);
+        possibleMoves.push([place, frontRight, onePos[1]]);
       }
       // front Left
       if (vertical < 8 && inlineRight && !allies.includes(`${frontLeft}`)) {
-        possibleMoves.push([place, frontLeft]);
+        possibleMoves.push([place, frontLeft, onePos[1]]);
       }
       // back Right
       if (vertical > 1 && inlineRight && !allies.includes(`${backRight}`)) {
-        possibleMoves.push([place, backRight]);
+        possibleMoves.push([place, backRight, onePos[1]]);
       }
       // back left
       if (vertical > 1 && inlineRight && !allies.includes(`${backLeft}`)) {
-        possibleMoves.push([place, backLeft]);
+        possibleMoves.push([place, backLeft, onePos[1]]);
       }
     }
   });
@@ -256,26 +256,115 @@ function possibleMove() {
   return {
     blackMoves,
     whiteMoves,
+    whitePawnAndPosition,
+    blackPawnAndPosition,
   };
 }
+const randomMove = (arLenght) => Math.floor(Math.random() * (arLenght));
 
 const fight = () => {
-  const { blackMoves } = possibleMove();
+  const {
+    blackMoves, whitePawnAndPosition, blackPawnAndPosition, whiteMoves,
+  } = possibleMove();
   if (blackMoves.length === 0 || gameOver) {
     return;
   }
-  const randomMove = Math.floor(Math.random() * (blackMoves.length));
-  const drawnMove = blackMoves[randomMove];
-  board.move(`${drawnMove[0]}-${drawnMove[1]}`);
+
+  const attackKing = [];
+  const attackQueen = [];
+  const attackPawn = [];
+  const bestNoAttackMoves = [];
+  const defenceKing = [];
+  const defenceQuen = [];
+  const defencePown = [];
+
+  whitePawnAndPosition.forEach((onePos) => {
+    const field = onePos[0];
+    const pawn = onePos[1];
+
+    blackMoves.forEach((move) => {
+      if (move[1] === field && pawn === 'wK') {
+        attackKing.push(move);
+      } else if (move[1] === field && pawn === 'wQ') {
+        attackQueen.push(move);
+      } else if (move[1] === field && pawn === 'wP') {
+        attackPawn.push(move);
+      }
+    });
+  });
+
+  blackMoves.forEach((oneMove) => {
+    const pawn = oneMove[2];
+    if (pawn === 'bP') {
+      bestNoAttackMoves.push(oneMove);
+    }
+  });
+
+  whiteMoves.forEach((oneWhiteMove) => {
+    const move = oneWhiteMove[1];
+    blackMoves.forEach((blackMove) => {
+      const position = blackMove[0];
+      const target = blackMove[1];
+      const pawn = blackMove[2];
+
+      if (move === position && pawn === 'bK') {
+        defenceKing.push(blackMove);
+      } else if (move === position && pawn === 'bQ') {
+        defenceQuen.push(blackMove);
+      } else if (move === position && pawn === 'bP') {
+        defencePown.push(blackMove);
+      }
+    });
+  });
+
   turn = true;
+  if (attackKing.length) {
+    const attack = attackKing[randomMove(attackKing.length)];
+    board.move(`${attack[0]}-${attack[1]}`);
+    return;
+  }
+  if (defenceKing.length) {
+    const defence = defenceKing[randomMove(defenceKing.length)];
+    board.move(`${defence[0]}-${defence[1]}`);
+    return;
+  }
+  if (attackQueen.length) {
+    const attack = attackQueen[randomMove(attackQueen.length)];
+    board.move(`${attack[0]}-${attack[1]}`);
+    return;
+  }
+  if (defenceQuen.length) {
+    const defence = defenceQuen[randomMove(defenceQuen.length)];
+    board.move(`${defence[0]}-${defence[1]}`);
+    return;
+  } if (attackPawn.length) {
+    const attack = attackPawn[randomMove(attackPawn.length)];
+    board.move(`${attack[0]}-${attack[1]}`);
+    return;
+  }
+  if (defencePown.length) {
+    const defence = defencePown[randomMove(defencePown.length)];
+    board.move(`${defence[0]}-${defence[1]}`);
+    return;
+  } if (bestNoAttackMoves.length) {
+    const moves = bestNoAttackMoves[randomMove(bestNoAttackMoves.length)];
+    board.move(`${moves[0]}-${moves[1]}`);
+    return;
+  }
+
+   const random = blackMoves[randomMove(blackMoves.length)];
+      board.move(`${random[0]}-${random[1]}`);
+
+
+
 };
 
-const onDrop = (source, target) => {
+const onDrop = (source, target, piece) => {
   const { whiteMoves } = possibleMove();
   if (whiteMoves.length === 0 || gameOver) {
     return 'snapback';
   }
-  const actualMove = [source, target];
+  const actualMove = [source, target, piece];
   let isLegalMove = false;
   // check legal Moves for white player
   if (turn) {
