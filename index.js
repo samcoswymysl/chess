@@ -131,7 +131,7 @@ const generateArrLegalMoves = (ourPawnAndPosition, white, black, color) => {
       'wP', front, frontRight, frontLeft] : ['bP', back, backRight, backLeft];
     // console.log(vertical > 1 && vertical < 8)
 
-    // if places ahed dont have ahe pown
+    // if places on front is empty
     if (onePos[1] === pawn[0]) {
       if (!enemies.includes(`${pawn[1]}`) && vertical > 1 && vertical < 8 && !allies.includes(`${pawn[1]}`)) {
         possibleMoves.push([place, pawn[1], onePos[1]]);
@@ -260,11 +260,11 @@ function possibleMove() {
     blackPawnAndPosition,
   };
 }
-const randomMove = (arLenght) => Math.floor(Math.random() * (arLenght));
+const randomMove = (arLength) => Math.floor(Math.random() * (arLength));
 
 const fight = () => {
   const {
-    blackMoves, whitePawnAndPosition, blackPawnAndPosition, whiteMoves,
+    blackMoves, whitePawnAndPosition, whiteMoves
   } = possibleMove();
   if (blackMoves.length === 0 || gameOver) {
     return;
@@ -275,8 +275,8 @@ const fight = () => {
   const attackPawn = [];
   const bestNoAttackMoves = [];
   const defenceKing = [];
-  const defenceQuen = [];
-  const defencePown = [];
+  const defenceQueen = [];
+  const defencePawn = [];
 
   whitePawnAndPosition.forEach((onePos) => {
     const field = onePos[0];
@@ -304,15 +304,14 @@ const fight = () => {
     const move = oneWhiteMove[1];
     blackMoves.forEach((blackMove) => {
       const position = blackMove[0];
-      const target = blackMove[1];
       const pawn = blackMove[2];
 
       if (move === position && pawn === 'bK') {
         defenceKing.push(blackMove);
       } else if (move === position && pawn === 'bQ') {
-        defenceQuen.push(blackMove);
+        defenceQueen.push(blackMove);
       } else if (move === position && pawn === 'bP') {
-        defencePown.push(blackMove);
+        defencePawn.push(blackMove);
       }
     });
   });
@@ -333,8 +332,8 @@ const fight = () => {
     board.move(`${attack[0]}-${attack[1]}`);
     return;
   }
-  if (defenceQuen.length) {
-    const defence = defenceQuen[randomMove(defenceQuen.length)];
+  if (defenceQueen.length) {
+    const defence = defenceQueen[randomMove(defenceQueen.length)];
     board.move(`${defence[0]}-${defence[1]}`);
     return;
   } if (attackPawn.length) {
@@ -342,8 +341,8 @@ const fight = () => {
     board.move(`${attack[0]}-${attack[1]}`);
     return;
   }
-  if (defencePown.length) {
-    const defence = defencePown[randomMove(defencePown.length)];
+  if (defencePawn.length) {
+    const defence = defencePawn[randomMove(defencePawn.length)];
     board.move(`${defence[0]}-${defence[1]}`);
     return;
   } if (bestNoAttackMoves.length) {
@@ -352,11 +351,8 @@ const fight = () => {
     return;
   }
 
-   const random = blackMoves[randomMove(blackMoves.length)];
-      board.move(`${random[0]}-${random[1]}`);
-
-
-
+  const random = blackMoves[randomMove(blackMoves.length)];
+  board.move(`${random[0]}-${random[1]}`);
 };
 
 const onDrop = (source, target, piece) => {
